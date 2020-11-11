@@ -1,47 +1,53 @@
+import ImageCard from './ImageCard';
+import Model from './Model';
+
 const fileElement = document.querySelector('.overlapped');
 const dropArea = document.querySelector('.drop-area');
-const preview = document.querySelector('.preview');
 
-function createPreview(eventFiles) {
-  const files = Array.from(eventFiles);
-  files.forEach((file) => {
-    fileElement.value = null;
-    const imgContainer = document.createElement('div');
-    imgContainer.className = 'img-container';
-    const img = document.createElement('img');
-    img.className = ('image');
-    const close = document.createElement('div');
-    close.className = 'close';
-    close.innerHTML = '<img src="./close.png" class="close-image" alt="close-button">';
+const model = new Model();
 
-    img.src = URL.createObjectURL(file);
-    imgContainer.appendChild(img);
-    imgContainer.appendChild(close);
-    preview.appendChild(imgContainer);
+function appendImage(file) {
+  const src = `${model.serverURL}?method=image&id=${file.id}`;
+  const image = new ImageCard(model);
+  image.createPreview(src, file.id);
+}
 
-    close.addEventListener('click', () => {
-      close.closest('.img-container').parentNode.removeChild(close.closest('.img-container'));
+/* отображает сохраненный на сервере изображения при загрузке браузера */
+document.addEventListener('DOMContentLoaded', () => {
+  model.getAll().then((response) => {
+    response.forEach((file) => {
+      appendImage(file);
     });
   });
-}
+});
 
 dropArea.addEventListener('dragover', (e) => {
   e.preventDefault();
   dropArea.classList.add('dragover');
 });
 
+/* Для отправки файлов, которые были помещены в drop area */
 dropArea.addEventListener('drop', (e) => {
   e.preventDefault();
   dropArea.classList.remove('dragover');
-  createPreview(e.dataTransfer.files);
+  const formData = new FormData();
+  for (let i = 0; i < e.dataTransfer.files.length; i++) {
+    formData.append('files[]', e.dataTransfer.files.item(i));
+  }
+  model.save(formData);
 });
 
+/* Для открытия окна выбора файла при клике на дропзону */
 dropArea.addEventListener('click', () => {
-  fileElement.addEventListener('click', () => {
-    fileElement.addEventListener('change', (e) => {
-      createPreview(e.target.files);
-    });
-  });
-
   fileElement.dispatchEvent(new MouseEvent('click'));
+});
+
+/* Для отправки файлов на бэк после их выбора */
+fileElement.addEventListener('change', () => {
+  const selectedFiles = document.getElementById('files-input').files;
+  const formData = new FormData();
+  selectedFiles.forEach((file) => {
+    formData.append('files[]', file);
+  });
+  model.save(formData);
 });

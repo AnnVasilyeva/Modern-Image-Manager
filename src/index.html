@@ -5,11 +5,11 @@
     <title>Image-Manager</title>
 </head>
 <body>
-<div class="file-container">
-    <input data-id="file" class="overlapped" type="file" accept="image/*" multiple="multiple">
+<form class="file-container" enctype="multipart/form-data">
+    <input id="files-input" data-id="file" class="overlapped" type="file" accept="image/*" multiple="multiple">
     <div class="drop-area">Drag and Drop files here or Click to select</div>
     <div class="preview"></div>
-</div>
+</form>
 
 </body>
 </html>
