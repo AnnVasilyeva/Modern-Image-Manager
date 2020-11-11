@@ -18,11 +18,11 @@ export default class Model {
     const self = this;
     xhr.onerror = () => {
       console.log('Ошибка');
-    }
+    };
     xhr.onload = () => {
       const image = new ImageCard(self);
       JSON.parse(xhr.response).forEach((file) => {
-          image.createPreview(`${serverUrl}?method=image&id=${file.id}`, file.id);
+        image.createPreview(`${serverUrl}?method=image&id=${file.id}`, file.id);
       });
     };
 
